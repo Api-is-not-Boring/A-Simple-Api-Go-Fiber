@@ -4,8 +4,6 @@ import (
 	m "A-Simple-Api-Go-Fiber/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"net/http"
-	"time"
 )
 
 // CreateRoutes for fiber app
@@ -25,17 +23,11 @@ func CreateRoutes(app *fiber.App) {
 
 // Ping endpoint Api v1
 func ping(c *fiber.Ctx) error {
-	req := c.GetReqHeaders()
-	r := m.Pong{
-		Agent:   req[fiber.HeaderUserAgent],
-		Date:    time.Now().Format(http.TimeFormat),
-		Message: "pong",
-	}
-	return c.JSON(r)
+	return c.JSON(m.GetPong(c))
 }
 
 func info(c *fiber.Ctx) error {
-	return c.SendString("info")
+	return c.JSON(m.GetInfo())
 }
 
 func connection(c *fiber.Ctx) error {
