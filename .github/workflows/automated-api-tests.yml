@@ -26,7 +26,7 @@ jobs:
       run: go build 
       
     - name: Run Api
-      run: ${{github.workspace}}/A-Simple-Api-Go-Fiber
+      run: ${{github.workspace}}/A-Simple-Api-Go-Fiber &
 
     - name: Install Postman CLI
       run: |
