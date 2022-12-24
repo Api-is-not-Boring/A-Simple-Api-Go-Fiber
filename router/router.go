@@ -14,7 +14,7 @@ func CreateRoutes(app *fiber.App) {
 	v1 := api.Group("/v1")
 	v1.Get("/ping", ping)
 	v1.Get("/info", info)
-	v1.Get("/connection", connection)
+	v1.Get("/connections", connections)
 
 	// TODO Api v2 Restful
 
@@ -30,6 +30,6 @@ func info(c *fiber.Ctx) error {
 	return c.JSON(m.GetInfo())
 }
 
-func connection(c *fiber.Ctx) error {
-	return c.SendString("connection")
+func connections(c *fiber.Ctx) error {
+	return c.JSON(m.GetConnections())
 }

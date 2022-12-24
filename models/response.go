@@ -3,9 +3,11 @@ package models
 import (
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/shirou/gopsutil/v3/net"
 	"net/http"
 	"os"
 	"runtime/debug"
+	"strconv"
 	"time"
 )
 
@@ -24,7 +26,7 @@ func GetPong(c *fiber.Ctx) Pong {
 	}
 }
 
-type Project struct {
+type project struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Language    string `json:"language"`
@@ -34,7 +36,7 @@ type Project struct {
 }
 
 type Info struct {
-	Project Project `json:"project"`
+	Project project `json:"project"`
 }
 
 func getGitHash() string {
@@ -51,7 +53,7 @@ func getGitHash() string {
 
 func GetInfo() Info {
 	return Info{
-		Project: Project{
+		Project: project{
 			Name:        os.Getenv("NAME"),
 			Description: os.Getenv("DESCRIPTION"),
 			Language:    os.Getenv("LANGUAGE"),
@@ -62,12 +64,29 @@ func GetInfo() Info {
 	}
 }
 
+type connection struct {
+	Id       string `json:"id"`
+	Protocol string `json:"protocol"`
+	Type     string `json:"type"`
+	Local    string `json:"local"`
+	Remote   string `json:"remote"`
+}
+
 type Client struct {
-	Connections []struct {
-		Id       string `json:"id"`
-		Protocol string `json:"protocol"`
-		Type     string `json:"type"`
-		Local    string `json:"local"`
-		Remote   string `json:"remote"`
-	} `json:"connections"`
+	Connections []connection `json:"connections"`
+}
+
+func GetConnections() Client {
+	r := Client{}
+	cons, _ := net.ConnectionsPid("tcp", int32(os.Getpid()))
+	for _, con := range cons {
+		r.Connections = append(r.Connections, connection{
+			Id:       strconv.Itoa(int(con.Fd)),
+			Protocol: "TCP",
+			Type:     con.Status,
+			Local:    con.Laddr.IP + ":" + strconv.Itoa(int(con.Laddr.Port)),
+			Remote:   con.Raddr.IP + ":" + strconv.Itoa(int(con.Raddr.Port)),
+		})
+	}
+	return r
 }
