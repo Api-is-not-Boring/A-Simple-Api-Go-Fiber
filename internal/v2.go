@@ -24,6 +24,12 @@ type allCars struct {
 	Cars  []car `json:"cars"`
 }
 
+type user struct {
+	ID       int    `gorm:"primaryKey,autoIncrement"`
+	Username string `gorm:"not null" form:"username"`
+	Password string `gorm:"not null" form:"password"`
+}
+
 type requestMethod string
 
 type v2Response struct {
@@ -85,9 +91,11 @@ func DbInit() (*gorm.DB, error) {
 		panic("failed to migrate database")
 	}
 
+	err = db.AutoMigrate(&user{})
+
 	// Create Data
 	db.CreateInBatches(&initCars, 8)
-
+	db.Create(&user{Username: "admin", Password: "password"})
 	return db, err
 }
 

@@ -14,6 +14,13 @@ func CreateRoutes(app *fiber.App) {
 
 	// Api v1
 	v1 := api.Group("/v1")
+	v1.Get("/", func(c *fiber.Ctx) error {
+		err := c.Redirect("/api/v1/info", fiber.StatusMovedPermanently)
+		if err != nil {
+			return err
+		}
+		return c.JSON(fiber.Map{"status": "[v1] -> 301 Redirect"})
+	})
 	v1.Get("/ping", ping)
 	v1.Get("/info", info)
 	v1.Get("/connections", connections)
@@ -31,6 +38,10 @@ func CreateRoutes(app *fiber.App) {
 	// TODO Api v3 Auth Jwt
 	v3 := api.Group("/v3")
 	v3.Get("/auth", announce)
+	v3.Post("/auth", login)
+	v3.Use(m.V3Middleware)
+	v3.Get("/check", check)
+	v3.Get("/secure", secure)
 
 }
 
@@ -47,7 +58,7 @@ func connections(c *fiber.Ctx) error {
 	return c.JSON(m.GetConnections())
 }
 
-// GetCars Endpoint Api v2
+// Endpoint Api v2
 func getCars(c *fiber.Ctx) error {
 	return c.JSON(m.GetCars(c, db))
 }
@@ -64,6 +75,19 @@ func deleteCar(c *fiber.Ctx) error {
 	return c.JSON(m.DeleteCar(c, db))
 }
 
+// Endpoint Api v3
 func announce(c *fiber.Ctx) error {
 	return c.JSON(m.Announce(c))
+}
+
+func login(c *fiber.Ctx) error {
+	return c.JSON(m.Login(c, db))
+}
+
+func check(c *fiber.Ctx) error {
+	return c.JSON(m.Check(c))
+}
+
+func secure(c *fiber.Ctx) error {
+	return c.JSON(m.Secure())
 }
