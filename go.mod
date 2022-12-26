@@ -5,6 +5,9 @@ go 1.19
 require (
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/gofiber/fiber/v2 v2.40.1
+	github.com/gofiber/jwt/v3 v3.3.4
+	github.com/golang-jwt/jwt/v4 v4.4.3
+	github.com/jaevor/go-nanoid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/shirou/gopsutil/v3 v3.22.11
 	gorm.io/driver/sqlite v1.4.3
@@ -16,10 +19,6 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/gofiber/jwt/v3 v3.3.4 // indirect
-	github.com/gofiber/redirect/v2 v2.1.29 // indirect
-	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
-	github.com/jaevor/go-nanoid v1.3.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.15.13 // indirect
