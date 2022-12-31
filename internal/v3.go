@@ -6,6 +6,7 @@ import (
 	j "github.com/gofiber/jwt/v3"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/jaevor/go-nanoid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"strconv"
 	"time"
@@ -73,10 +74,13 @@ func Announce(c *fiber.Ctx) interface{} {
 
 func Login(c *fiber.Ctx, db *gorm.DB) interface{} {
 	loginUser := new(user)
-	if err := c.BodyParser(loginUser); err != nil {
-		return err
+	if err := db.Take(&loginUser, "Username = ?", c.FormValue("username")).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		m := new(v3Message)
+		c.Status(fiber.StatusUnauthorized)
+		m.setMessage(c, "Unauthorized")
+		return m
 	}
-	if err := db.Take(&user{}, "Username = ? AND Password = ?", &loginUser.Username, &loginUser.Password).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := bcrypt.CompareHashAndPassword([]byte(loginUser.Password), []byte(c.FormValue("password"))); err != nil {
 		m := new(v3Message)
 		c.Status(fiber.StatusUnauthorized)
 		m.setMessage(c, "Unauthorized")

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -95,7 +96,8 @@ func DbInit() (*gorm.DB, error) {
 
 	// Create Data
 	db.CreateInBatches(&initCars, 8)
-	db.Create(&user{Username: "admin", Password: "password"})
+	password, _ := bcrypt.GenerateFromPassword([]byte("password"), 12)
+	db.Create(&user{Username: "admin", Password: string(password)})
 	return db, err
 }
 
