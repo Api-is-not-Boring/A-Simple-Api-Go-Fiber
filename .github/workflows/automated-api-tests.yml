@@ -13,6 +13,11 @@ jobs:
     strategy:
       matrix:
         os: [ "ubuntu-latest", "macos-latest" ]
+        include:
+          - os: "ubuntu-latest"
+            postman-cli: "https://dl-cli.pstmn.io/install/linux64.sh"
+          - os: "macos-latest"
+            postman-cli: "https://dl-cli.pstmn.io/install/osx_64.sh"
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -21,7 +26,9 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version-file: '${{github.workspace}}/go.mod'
+        check-latest: true
+        cache: true
 
     - name: Install dependencies
       run: go get .
@@ -31,15 +38,10 @@ jobs:
 
     - name: Run Api
       run: ${{github.workspace}}/A-Simple-Api-Go-Fiber &
-
-    - if: matrix.os == 'ubuntu-latest'
-      name: Install Postman CLI Linux
+      
+    - name: Install Postman CLI MacOS
       run: |
-        curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-    - if: matrix.os == 'macOS-latest'
-      name: Install Postman CLI MacOS
-      run: |
-        curl -o- "https://dl-cli.pstmn.io/install/osx_64.sh" | sh
+        curl -o- ${{matrix.postman-cli}} | sh
     - name: Login to Postman CLI
       run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
     - name: Run API tests
