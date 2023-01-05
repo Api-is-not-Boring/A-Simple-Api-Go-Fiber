@@ -1,14 +1,15 @@
-package internal
+package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
-	_ "github.com/joho/godotenv/autoload"
-	"github.com/shirou/gopsutil/v3/net"
 	"net/http"
 	"os"
 	"runtime/debug"
 	"strconv"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/shirou/gopsutil/v3/net"
 )
 
 type Pong struct {

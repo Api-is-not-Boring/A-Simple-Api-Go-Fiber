@@ -1,15 +1,16 @@
-package internal
+package handler
 
 import (
 	"errors"
+	"time"
+
+	m "A-Simple-Api-Go-Fiber/models"
 	"github.com/gofiber/fiber/v2"
 	j "github.com/gofiber/jwt/v3"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/jaevor/go-nanoid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"strconv"
-	"time"
 )
 
 var v3Secret = generateSecret()
@@ -19,28 +20,13 @@ var V3Config = j.Config{
 	SigningKey:    []byte(v3Secret),
 	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
 		ctx.Status(fiber.StatusUnauthorized)
-		m := new(v3Message)
-		m.setMessage(ctx, "Invalid or expired JWT")
+		m := new(m.V3Message)
+		m.SetMessage(ctx, "Invalid or expired JWT")
 		return ctx.JSON(m)
 	},
 }
 
 var V3Middleware = j.New(V3Config)
-
-var v3MessagePrefix = "[v3] -> "
-
-type v3Message struct {
-	Message string `json:"message"`
-}
-
-func (v *v3Message) setMessage(c *fiber.Ctx, message string) {
-	v.Message = v3MessagePrefix + strconv.Itoa(c.Response().StatusCode()) + " " + message
-}
-
-type v3Success struct {
-	v3Message
-	Token string `json:"token"`
-}
 
 func generateSecret() string {
 	secret, err := nanoid.Standard(32)
@@ -67,35 +53,35 @@ func generateToken() (string, error) {
 }
 
 func Announce(c *fiber.Ctx) interface{} {
-	m := new(v3Message)
-	m.setMessage(c, "Login with Post Request")
-	return m
+	message := new(m.V3Message)
+	message.SetMessage(c, "Login with Post Request")
+	return message
 }
 
 func Login(c *fiber.Ctx, db *gorm.DB) interface{} {
-	loginUser := new(user)
+	loginUser := new(m.User)
 	if err := db.Take(&loginUser, "Username = ?", c.FormValue("username")).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		m := new(v3Message)
+		message := new(m.V3Message)
 		c.Status(fiber.StatusUnauthorized)
-		m.setMessage(c, "Unauthorized")
-		return m
+		message.SetMessage(c, "Unauthorized")
+		return message
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(loginUser.Password), []byte(c.FormValue("password"))); err != nil {
-		m := new(v3Message)
+		message := new(m.V3Message)
 		c.Status(fiber.StatusUnauthorized)
-		m.setMessage(c, "Unauthorized")
-		return m
+		message.SetMessage(c, "Unauthorized")
+		return message
 	}
 	token, _ := generateToken()
-	message := v3Success{Token: token}
-	message.v3Message.setMessage(c, "Login Successful !!!")
+	message := m.V3Success{Token: token}
+	message.V3Message.SetMessage(c, "Login Successful !!!")
 	return message
 }
 
 func Check(c *fiber.Ctx) interface{} {
-	m := new(v3Message)
-	m.setMessage(c, "JWT Token validation successful!")
-	return m
+	message := new(m.V3Message)
+	message.SetMessage(c, "JWT Token validation successful!")
+	return message
 }
 
 func Secure() map[string]interface{} {

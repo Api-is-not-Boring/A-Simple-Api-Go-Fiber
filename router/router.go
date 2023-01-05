@@ -1,7 +1,7 @@
 package router
 
 import (
-	m "A-Simple-Api-Go-Fiber/internal"
+	m "A-Simple-Api-Go-Fiber/handler"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
