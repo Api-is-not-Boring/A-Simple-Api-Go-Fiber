@@ -39,7 +39,7 @@ jobs:
     - name: Run Api
       run: ${{github.workspace}}/A-Simple-Api-Go-Fiber &
       
-    - name: Install Postman CLI MacOS
+    - name: Install Postman CLI
       run: |
         curl -o- ${{matrix.postman-cli}} | sh
     - name: Login to Postman CLI
