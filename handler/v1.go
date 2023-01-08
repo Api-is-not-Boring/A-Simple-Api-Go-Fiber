@@ -14,7 +14,7 @@ import (
 
 type Pong struct {
 	Agent   string `json:"agent"`
-	Date    string `json:"date"`
+	Date    string `json:"datetime"`
 	Message string `json:"message"`
 }
 
@@ -66,7 +66,7 @@ func GetInfo() Info {
 }
 
 type connection struct {
-	Id       string `json:"id"`
+	Id       int    `json:"id"`
 	Protocol string `json:"protocol"`
 	Type     string `json:"type"`
 	Local    string `json:"local"`
@@ -81,8 +81,17 @@ func GetConnections() Client {
 	r := Client{}
 	cons, _ := net.ConnectionsPid("tcp", int32(os.Getpid()))
 	for _, con := range cons {
+		if con.Status == "LISTEN" {
+			con.Status = "LISTENING"
+		}
+		if con.Laddr.IP == "*" {
+			con.Laddr.IP = "0.0.0.0"
+		}
+		if con.Raddr.IP == "" {
+			con.Raddr.IP = "0.0.0.0"
+		}
 		r.Connections = append(r.Connections, connection{
-			Id:       strconv.Itoa(int(con.Fd)),
+			Id:       int(con.Fd),
 			Protocol: "TCP",
 			Type:     con.Status,
 			Local:    con.Laddr.IP + ":" + strconv.Itoa(int(con.Laddr.Port)),
