@@ -21,7 +21,7 @@ type Pong struct {
 func GetPong(c *fiber.Ctx) Pong {
 	req := c.GetReqHeaders()
 	return Pong{
-		Agent:   req[fiber.HeaderUserAgent],
+		Agent:   req[fiber.HeaderUserAgent][0],
 		Date:    time.Now().Format(http.TimeFormat),
 		Message: "pong",
 	}
